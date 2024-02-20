@@ -37,8 +37,14 @@ public class Usuario {
         this.confirmacaoSenha = confirmacaoSenha;
     }
 
+    Usuario(){}
+
     public String getNome() {
         return nome;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public String getSenha() {
