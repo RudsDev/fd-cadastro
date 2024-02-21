@@ -12,6 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstdecision.cadatro.api.domain.dtos.output.UsuarioOutput;
 import com.firstdecision.cadatro.api.domain.models.Usuario;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/v1/usuarios")
 public class UsuarioController {
@@ -21,7 +23,7 @@ public class UsuarioController {
     
     @PostMapping()
     public ResponseEntity<UsuarioOutput> create(
-        @RequestBody Usuario input
+       @Valid @RequestBody Usuario input
     ) {
         var output = mapper.convertValue(input, UsuarioOutput.class);
         return new ResponseEntity<UsuarioOutput>(output, HttpStatus.CREATED);
