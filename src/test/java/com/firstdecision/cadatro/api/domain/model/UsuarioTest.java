@@ -33,7 +33,7 @@ public class UsuarioTest {
 
     @Test
     void deveRetonarFalse_QuandoSenhasDiferentes() {
-        var usuario = new Usuario(senha, confirmacaoSenha);
+        var usuario = new Usuario(nome, email, senha, confirmacaoSenha);
         boolean actual = usuario.isSenhasIguais();
         assertFalse(actual);
     }
@@ -41,7 +41,7 @@ public class UsuarioTest {
     @Test
     void deveRetonarTrue_QuandoSenhasIguais() {
         String confirmacaoSenha = senha;
-        var usuario = new Usuario(senha, confirmacaoSenha);
+        var usuario = new Usuario(nome, email, senha, confirmacaoSenha);
         boolean actual = usuario.isSenhasIguais();
         assertTrue(actual);
     }
