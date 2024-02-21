@@ -65,4 +65,20 @@ public class UsuarioControllerTest {
         .andExpect(jsonPath("$.email", is(usuario.getEmail())));
     }
 
+    @Test
+    void deveRetornarStatus201SemSenhas_QuandoCriarUsuarioCorretamente() throws Exception {
+        String json = mapper.writeValueAsString(usuario);
+        mvc.perform(
+            post(URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .characterEncoding("utf-8")
+        )
+        .andDo(print())
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.senha").doesNotExist()) 
+        .andExpect(jsonPath("$.confirmacaoSenha").doesNotExist())
+        .andExpect(jsonPath("$.senhasIguais").doesNotExist());
+    }
+
 }
