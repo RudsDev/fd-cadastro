@@ -3,6 +3,8 @@ package com.firstdecision.cadatro.api.api.controller;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +24,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.firstdecision.cadatro.api.api.controller.v1.UsuarioController;
+import com.firstdecision.cadatro.api.api.services.UsuarioService;
+import com.firstdecision.cadatro.api.domain.exceptions.NegocioException;
 import com.firstdecision.cadatro.api.domain.models.Usuario;
 
 @SpringBootTest
@@ -30,6 +35,7 @@ import com.firstdecision.cadatro.api.domain.models.Usuario;
 })
 public class UsuarioControllerTest {
 
+    final Long id = null;
     final String URL = "/v1/usuarios";
     final String senha = "123456";
     final String confirmacaoSenha = "654321";
@@ -39,13 +45,16 @@ public class UsuarioControllerTest {
 
     MockMvc mvc;
     
-    Usuario usuario = new Usuario(nome, email, senha, confirmacaoSenha);
+    Usuario usuario = new Usuario(id, nome, email, senha, confirmacaoSenha);
 
     @Autowired
     ObjectMapper mapper;
 
     @Autowired
     UsuarioController controller;
+
+    @MockBean
+    UsuarioService service;
 
     @BeforeEach
     public void setup() { 
@@ -55,7 +64,7 @@ public class UsuarioControllerTest {
     @Test
     void deveRetornarStatus201ComValoresCorretos_QuandoCriarUsuarioCorretamente() throws Exception {
         String json = mapper.writeValueAsString(usuario);
-
+        when(service.salvar(any())).thenReturn(usuario);
         mvc.perform(
             post(URL)
             .contentType(MediaType.APPLICATION_JSON)
@@ -82,6 +91,21 @@ public class UsuarioControllerTest {
         .andExpect(jsonPath("$.senha").doesNotExist()) 
         .andExpect(jsonPath("$.confirmacaoSenha").doesNotExist())
         .andExpect(jsonPath("$.senhasIguais").doesNotExist());
+    }
+
+    @Test
+    void deveRetornarLancarExceptionStatus400_QuandoSenhasDiferentes() throws Exception {
+        String json = mapper.writeValueAsString(usuario);
+        when(service.salvar(any())).thenThrow(NegocioException.class);
+        var result = mvc.perform(
+            post(URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .characterEncoding("utf-8")
+        )
+        .andDo(print())
+        .andReturn();
+        assertEquals(Response.SC_BAD_REQUEST, result.getResponse().getStatus());
     }
 
     @Test

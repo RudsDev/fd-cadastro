@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.firstdecision.cadatro.api.api.services.UsuarioService;
 import com.firstdecision.cadatro.api.domain.dtos.output.UsuarioOutput;
+import com.firstdecision.cadatro.api.domain.exceptions.NegocioException;
 import com.firstdecision.cadatro.api.domain.models.Usuario;
 
 import jakarta.validation.Valid;
@@ -21,12 +23,20 @@ public class UsuarioController {
     @Autowired
     ObjectMapper mapper;
     
+    @Autowired
+    UsuarioService service;
+    
     @PostMapping()
-    public ResponseEntity<UsuarioOutput> create(
+    public ResponseEntity<?> create(
        @Valid @RequestBody Usuario input
     ) {
-        var output = mapper.convertValue(input, UsuarioOutput.class);
-        return new ResponseEntity<UsuarioOutput>(output, HttpStatus.CREATED);
+        try {
+            var usuario = service.salvar(input);
+            var output = mapper.convertValue(usuario, UsuarioOutput.class);
+            return new ResponseEntity<UsuarioOutput>(output, HttpStatus.CREATED);
+        } catch (NegocioException e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
