@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.firstdecision.cadatro.api.api.controller.ApiErrorHandler;
 import com.firstdecision.cadatro.api.api.services.UsuarioService;
 import com.firstdecision.cadatro.api.domain.dtos.output.UsuarioOutput;
 import com.firstdecision.cadatro.api.domain.exceptions.NegocioException;
@@ -35,7 +36,7 @@ public class UsuarioController {
             var output = mapper.convertValue(usuario, UsuarioOutput.class);
             return new ResponseEntity<UsuarioOutput>(output, HttpStatus.CREATED);
         } catch (NegocioException e) {
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return ApiErrorHandler.badRequest(e.getMessage());
         }
     }
 
