@@ -18,10 +18,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.firstdecision.cadatro.api.core.internationalization.Translator;
 import com.firstdecision.cadatro.api.domain.exceptions.ValidacaoException;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+
+	private static final String DADOS_INVALIDOS = "dados_invalidos";
 
 	@Override
 	@Nullable
@@ -49,7 +52,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 		campos.add(new ExceptionObject.Campo(ex.getNomeAtributo(), ex.getMessage()));
 		
-		ExceptionObject erro = createExceptionObjectBuilder("dados_invalidos", status, campos);
+		ExceptionObject erro = createExceptionObjectBuilder(DADOS_INVALIDOS, status, campos);
 		return super.handleExceptionInternal(ex, erro, new HttpHeaders(), status, request);
 	}
 
@@ -57,7 +60,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<?> handleRuntimeExpection(RuntimeException ex, WebRequest request) {
 		List<ExceptionObject.Campo> campos = new ArrayList<>();
 		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-		campos.add(new ExceptionObject.Campo("Erro", "Erro interno do servidor."));
+		campos.add(new ExceptionObject.Campo("Erro", Translator.toLocale("erro_confirmar_senha")));
 		ExceptionObject erro = createExceptionObjectBuilder("erro_interno", status, campos);
 		return super.handleExceptionInternal(ex, erro, new HttpHeaders(), status, request);
 	}
@@ -75,7 +78,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			.map(this::createCampo)
 			.toList();
 
-		ExceptionObject erro = createExceptionObjectBuilder("dados_invalidos", status, campos);
+		ExceptionObject erro = createExceptionObjectBuilder(DADOS_INVALIDOS, status, campos);
 		return super.handleExceptionInternal(ex, erro, headers, status, request);
 	}
 
