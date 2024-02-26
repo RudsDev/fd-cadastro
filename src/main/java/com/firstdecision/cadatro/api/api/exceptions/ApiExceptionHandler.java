@@ -53,6 +53,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		return super.handleExceptionInternal(ex, erro, new HttpHeaders(), status, request);
 	}
 
+	@ExceptionHandler(RuntimeException.class)
+	public ResponseEntity<?> handleRuntimeExpection(RuntimeException ex, WebRequest request) {
+		List<ExceptionObject.Campo> campos = new ArrayList<>();
+		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+		campos.add(new ExceptionObject.Campo("Erro", "Erro interno do servidor."));
+		ExceptionObject erro = createExceptionObjectBuilder("erro_interno", status, campos);
+		return super.handleExceptionInternal(ex, erro, new HttpHeaders(), status, request);
+	}
+
 	private ResponseEntity<Object> handleValidationInternal(
 		Exception ex,
 		HttpHeaders headers,
