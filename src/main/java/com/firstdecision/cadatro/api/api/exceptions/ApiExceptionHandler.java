@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -45,11 +46,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		List<ExceptionObject.Campo> campos = bindingResult
 			.getAllErrors()
 			.stream()
-			.map(error -> {
-				String nome = ((FieldError) error).getField();
-				String mensagem = error.getDefaultMessage();
-				return new ExceptionObject.Campo(nome, mensagem);
-			})
+			.map(this::createCampo)
 			.toList();
 
 		ExceptionObject erro = createExceptionObjectBuilder("dados_invalidos", status, campos);
@@ -62,5 +59,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		List<ExceptionObject.Campo> campos
 	) {
 		return new ExceptionObject(status.value(), mensagem, Instant.now(), campos);
+	}
+
+	private ExceptionObject.Campo createCampo(ObjectError error) {
+		return new ExceptionObject.Campo(
+			((FieldError) error).getField(),
+			error.getDefaultMessage()
+		);
 	}
 }
